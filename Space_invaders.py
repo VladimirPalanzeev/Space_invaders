@@ -136,7 +136,7 @@ def reset():
 
 # ++++++++++++++++++++ Основной блок программы +++++++++++++++
 
-# Созданаие окна
+# Создание окна
 root = Tk()
 root.resizable(False, False)
 root.title("Вторжение инопланетян")
@@ -190,14 +190,75 @@ playerSpeed = None                                  # Скорость смещ�
 LEFTKEY = 0
 RIGHTKEY = 1
 
-# Назначаем клавиши управления курсором
-
+# Назначаем клавиши управления
 cnv.bind("<Left>", lambda e, x=LEFTKEY: move(x))
 cnv.bind("<Right>", lambda e, x=RIGHTKEY: move(x))
 cnv.bind("<space>", lambda e: shoot())
 cnv.bind("<Escape>", lambda e: showMenu())
 
+# Спрайты ракеты, выпускаемой инопланетянами
+invadersRocketTexture = PhotoImage(file="image/rocket/rocket_invaders.png")
+invadersRocket = None                              # Объектна Canvas инопланетной ракеты
+invadersRocketSpeedScale = 1.05                    # Увеличение скорости с каждым кадром
+invadersRocketSpeedDefault = 1                     # Скорость по умолчанию
+invadersRocketSpeed = invadersRocketSpeedDefault   # Скорость ракеты. Больше - быстрей
 
+# Загружаем текстуры боевой ракеты (Изменяется лишь пламя из сопла)
+rocketFiles = ["rocket01.png", "rocket02.png", "rocket03.png", "rocket04.png"]
+rocketTexture = []
+for fileName in rocketFiles:
+    rocketTexture.append(PhotoImage(file=f"image/rocket/{fileName}"))
+
+rocketObject = None                 # Боевая ракета, которой стреляет игрок: объект на Canvas
+rocketSpeedYDefault = 8             # Скорость ракеты по умолчанию
+rocketSpeedY = rocketSpeedYDefault  # скорость ракеты по Y
+rocketScale = 1.05                  # Коэффициент ускорения выпущенной игроком ракеты
+
+# ======================== ТЕКСТУРЫ ВЗРЫВА ============================
+explosionFiles = ["expl01.png", "expl02.png", "expl03.png", "expl04.png",
+                  "expl05.png", "expl06.png", "expl07.png", "expl08.png"]
+explosionTexture = []
+for fileName in explosionFiles:
+    explosionTexture.append(PhotoImage(file=f"image/expl/{fileName}"))
+level = None   # Текущий уровень игры, задается в globalReset()
+frame = 0      # Кадр анимации для инопланетян
+
+# ========================= НАСТРОЙКА ИГРОКА ===========================
+score = 0          # Очки игрока
+penalty = 0        # Штрафы за промахи
+lives = 3          # Жизни
+playGame = False   # Игра False - "Нет игры" или True - "Игра началась"
+defaltName = "Anonymous"
+
+# ========================= МУНЮ ИГРЫ ===============================
+
+# Кнопка "Старт"
+menu1 = Button(root, text="Старт", font=", 20", width=20)
+menu1.place(x=-100, y=-100)
+menu1["command"] = startGame
+
+# Кнопка "Сброс"
+menu2 = Button(root, text="Сброс", font=", 20", width=20)
+menu2.place(x=-100, y=-100)
+menu2["command"] = restartGame
+
+# Кнопка для продолжения после вывода таблицы рекордов
+btnContinueAfterPause = None
+
+# Ниже кнопок расположена таблица рекордов
+onMenu = False           # Меню "Выключено"
+playerName = None        # Имя игрока
+scores = loadScores()    # Список с никами и очками
+textScores = None        # Список .create_text для отображения таблицы очков на Canvas
+
+informationLine = None   # "Информационная строка" внизу окна
+
+# ++++++++++++++++++ НАЧИНАЕМ ++++++++++++++++++++++++++++
+
+globalReset()     #
+reset()
+playGame = True
+mainloop()
 
 root.mainloop()
 
