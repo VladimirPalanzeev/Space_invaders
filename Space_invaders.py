@@ -157,6 +157,46 @@ cnv.place(x=0, y=0)
 # Текстура фона
 backGround = PhotoImage(file="image/background.png")
 
+# ++++++++++++++++++++ ИНОПЛАНЕТЯНЕ ++++++++++++++++++++++
+# Имена файлов с текстурами инопланетян
+invadersFile = ["inv01.png", "inv01_move.png",
+                "inv02.png", "inv02_move.png",
+                "inv03.png", "inv03_move.png"]
+
+# Загружаем текстуры
+invadersTexture = []
+for fileName in invadersFile:
+    invadersTexture.append(PhotoImage(file=f"image/{fileName}"))
+
+# Список информационных объектов
+# Индекс [0] - Текстура
+# Индекс [1] - Уровень
+invadersObject = None
+invadersSpeed = None
+
+leftInvadersBorder = None   # Левая и
+rightInvadersBorder = None  # Правая границы блока инопланетян в пикселях Необходимо для смены движения
+
+maxY = None # Самая нижняя точка Y расположения текстур инопланетян
+invadersWidth = None   # Количество столбцов инопланетян
+invadersHeight = None  # Количество строк инопланетян
+
+# ======================== ИГРОК =========================
+playerTexture = PhotoImage(file="image/player.png") # Текстура корабля игрока
+player = None                                       # Объект для игрока на Canvas
+playerSpeed = None                                  # Скорость смещения при нажатии на клавишу управления курсором
+
+# Константы-коды для направления движения
+LEFTKEY = 0
+RIGHTKEY = 1
+
+# Назначаем клавиши управления курсором
+
+cnv.bind("<Left>", lambda e, x=LEFTKEY: move(x))
+cnv.bind("<Right>", lambda e, x=RIGHTKEY: move(x))
+cnv.bind("<space>", lambda e: shoot())
+cnv.bind("<Escape>", lambda e: showMenu())
+
 
 
 root.mainloop()
