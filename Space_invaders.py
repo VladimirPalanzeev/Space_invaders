@@ -136,6 +136,30 @@ def reset():
 
 # ++++++++++++++++++++ Основной блок программы +++++++++++++++
 
+# Созданаие окна
+root = Tk()
+root.resizable(False, False)
+root.title("Вторжение инопланетян")
+root.iconbitmap("icon/icon.ico")
+
+# Геометрия окна
+WIDTH = 800
+HEIGHT = 480
+POS_X = root.winfo_screenwidth() // 2 - WIDTH // 2
+POS_Y = root.winfo_screenheight() //2 - HEIGHT //2
+root.geometry(f"{WIDTH}x{HEIGHT}+{POS_X}+{POS_Y}")
+
+# Канвас
+cnv = Canvas(root, width=WIDTH, height=HEIGHT, bg="#000000")
+cnv.config(highlightthickness=0)
+cnv.place(x=0, y=0)
+
+# Текстура фона
+backGround = PhotoImage(file="image/background.png")
+
+
+
+root.mainloop()
 
 
 
