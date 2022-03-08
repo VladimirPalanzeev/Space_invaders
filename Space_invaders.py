@@ -95,12 +95,68 @@ def startExplosion(n):
     pass
 
 # Анимация ракеты
-def animationShot(frame):
-    pass
+def animationShoot(frame):
+    global rocketObject, rocketSpeedY, penalty, score, player
 
-# При нажатии на пробел выстрел
+    if not playGame:
+        rocketObject = None
+        rocketSpeedY = rocketSpeedYDefault
+        return 0
+
+    cnv.move(rocketObject, 0, -rocketSpeedY)
+    rocketSpeedY *= rocketScale
+
+    x = getRocketX()
+    y = getRocketY()
+
+    frame += 1
+    if frame > len(rocketTexture) - 1:
+        frame = 0
+        sleep(0.02)
+    # Удаляем объект и создаем с новой текстурой
+    cnv.delete(rocketObject)
+    rocketObject = cnv.create_image(x, y, image=rocketTexture[frame])
+
+    if cnv.coords(rocketObject)[1] < maxY + SQUARE_SIZE:
+        rocketX = getRocketX()
+        rocketY = getRocketY()
+        find = 0
+        while (find < len(invadersObject)):
+            invadersX = getInvadersX(invadersObject[find])
+            invadersY = getInvadersY(invadersObject[find])
+            # Коэффициент 0.4 - чем меньше, тем точнее надо попасть
+            if abs(invadersX - rocketX) < SQUARE_SIZE * 0.4 and abs(invadersY - rocketY) < SQUARE_SIZE * 0.8:
+                score += 50
+                startExplosion(find)
+                y = -1
+                find = len(invadersObject)
+                penalty -= 5
+                find += 1
+    if y > 0:
+        # Рекурсивно вызываем анимацию
+        root.after(3, lambda frame=frame: animationShoot(frame))
+    else:
+        # Удаляем ракету по окончании анимации
+        cnv.delete(rocketObject)
+        # Увеличиваем штраф, независимо от попадания
+        # P.S. Уменьшаем штраф на 5, когда ракета поразила цель
+        penalty += 5
+        player[1] += 1
+        rocketSpeedY =rocketSpeedYDefault
+
+
+
+# При нажатии на пробел - выстрел
 def shoot():
-    pass
+    global player, rocketObject
+    if not playGame or onMenu:
+        return 0
+    if (player[1] == 0):
+        return 0
+    player[1] -= 1
+
+    rocketObject = cnv.create_image(getPlayerX(), getPlayerY(), image=rocketTexture[0])
+    root.after(10, lambda frame=0: animationShoot(frame))
 
 # Перемещение игрока
 def move(x):
@@ -117,7 +173,11 @@ def move(x):
 
 # Переключение на следующий уровень
 def nextLevel():
-    pass
+    global level, playGame
+    cnv.delete(ALL)
+    level += 1
+    playGame = True
+    reset()
 
 # Конец уровня
 def endLevel():
@@ -189,15 +249,29 @@ def mainloop():
 
 # Нажатие на кнопку старт
 def startGame():
-    pass
+    global playGame
+    if playGame:
+        hideMenu()
+        return 0
+    playGame = True
+    hideMenu()
+    mainloop()
 
 # Сброс всего под чистую с установкой первого уровня
 def globalReset():
-    pass
+    global level, score, penalty, playGame, playerSpeed, lives
+    playGame = False
+    playerSpeed = 5
+    level = 1
+    score = 0
+    penalty = 0
+    lives = 3
 
 # Перезапуск игры полностью
 def restartGame():
-    pass
+    globalReset()
+    reset()
+    showScores(-1)
 
 # Сброс и формирование объектов игрового мира
 def reset():
