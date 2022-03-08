@@ -39,7 +39,7 @@ def getPlayerX():
     return cnv.coords(player[0])[0]
 
 # Геттер - координата Y корабля игрока
-def gePlayerY():
+def getPlayerY():
     pass
 
 # Геттер - координата X ракеты
@@ -121,11 +121,71 @@ def nextLevel():
 
 # Конец уровня
 def endLevel():
-    pass
+    global playGame
+    playGame = False
+    cnv.delete(ALL)
+    cnv.create_text(WIDTH // 2, HEIGHT // 2, fill="#ffffff", font=f", 15",
+                    text=f"ПОБЕДА! ЗАГРУЖАЕМ СЛЕДУЮЩИЙ УРОВЕНЬ")
+    # Забираем фокус с Canvas чтобы не работали кнопки
+    root.focus_set()
+    root.update()
+    sleep(0.01)
+    root.after(300, nextLevel)
 
 # Главный цикл игры
 def mainloop():
-    pass
+    global invadersObject, leftInvadersBorder, rightInvadersBorder, invadersSpeed, playGame, score, maxY, frame
+
+    # Если список врагов пуст, то есть они все уничтожены
+    if len(invadersObject) == 0:
+        endLevel()
+    # Не выполняем mainloop если нет игры
+    if not playGame:
+        return 0
+
+    # Перерисовываем текстуры
+    for obj in invadersObject:
+        cnv.move(obj[0], int(invadersSpeed), 0)
+        xPos = getInvadersX(obj)
+        yPos = getInvadersY(obj)
+        cnv.delete(obj[0])
+        obj[0] = cnv.create_image(xPos, yPos, image=invadersTexture[obj[1] * 2 + frame])
+    #  Меняем кадр
+    frame += 1
+    if frame > 1:
+        frame = 0
+
+    # Изменяем левую и правую границу инопланетного массива
+    leftInvadersBorder += int(invadersSpeed)
+    rightInvadersBorder += int(invadersSpeed)
+
+    # Запуск ракеты инопланетян
+    if (randint(0, 150)) < abs(invadersSpeed) and invadersRocket == None:
+        startInvadersRocket()
+
+    # Проверяем для изменения направления движения самую левую точку X
+    # и самую правую точку X прямоугольного блока с инопланетянами
+    if rightInvadersBorder > WIDTH - SQUARE_SIZE or leftInvadersBorder < SQUARE_SIZE:
+        invadersSpeed *= 1.1
+        invadersSpeed = -invadersSpeed
+        maxY = 0
+        # Перебираем все элементы, т.к. нижние линии в какой-то момент могут быть уничтожены. Поэтому недостаточно
+        # взять координату "нижних" элементов математически,
+        # умножив размер спрайта на количество линий инопланетных кораблей
+        for obj in invadersObject:
+            cnv.move(obj[0], 0, SQUARE_SIZE)
+            # Находим максимально "нижнюю" точку блока инопланетян
+            if cnv.coords(obj[0])[1] + SQUARE_SIZE // 2 > maxY:
+                maxY = cnv.coords(obj[0])[1] + SQUARE_SIZE // 2
+
+    # Скорость обновления главного цикла: 100 миллисекунд, то есть 10 (десять) кадров в секунду
+    root.after(100, mainloop)
+    score -= .1
+    updateInfoLine()
+
+    # Если инопланетяне придавили игрока или жизней не осталось совсем
+    if maxY > getPlayerY() or lives < 0:
+        endGame()
 
 # Нажатие на кнопку старт
 def startGame():
