@@ -104,7 +104,16 @@ def shoot():
 
 # Перемещение игрока
 def move(x):
-    pass
+    if not playGame or onMenu:
+        return 0
+    if x == LEFTKEY:
+        cnv.move(player[0], -playerSpeed, 0)
+    elif x == RIGHTKEY:
+        cnv.move(player[0, playerSpeed, 0])
+    if getPlayerX() < SQUARE_SIZE:
+        cnv.move(player[0], playerSpeed, 0)
+    elif getPlayerX() > WIDTH - SQUARE_SIZE:
+        cnv.move(player[0], -playerSpeed, 0)
 
 # Переключение на следующий уровень
 def nextLevel():
@@ -145,6 +154,7 @@ root.iconbitmap("icon/icon.ico")
 # Геометрия окна
 WIDTH = 800
 HEIGHT = 480
+SQUARE_SIZE = 32                                     # Размер одного спрайта
 POS_X = root.winfo_screenwidth() // 2 - WIDTH // 2
 POS_Y = root.winfo_screenheight() //2 - HEIGHT //2
 root.geometry(f"{WIDTH}x{HEIGHT}+{POS_X}+{POS_Y}")
