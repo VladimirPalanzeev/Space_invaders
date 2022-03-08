@@ -36,7 +36,7 @@ def getInvadersY(obj):
 
 # Геттер - координата X корабля игрока
 def getPlayerX():
-    pass
+    return cnv.coords(player[0])[0]
 
 # Геттер - координата Y корабля игрока
 def gePlayerY():
@@ -141,7 +141,54 @@ def restartGame():
 
 # Сброс и формирование объектов игрового мира
 def reset():
-    pass
+    global invadersObject, invadersWidth, invadersHeight, invadersSpeed, leftInvadersBorder, rightInvadersBorder,\
+        player, maxY, rocketObject, invadersRocket
+
+    cnv.delete(ALL)                                               # Очищаем канвас
+    cnv.create_image(WIDTH // 2, HEIGHT // 2, image=backGround)   # Создаем фон (нижний слой)
+    cnv.focus_set() # Устанавливаем фокус для перехвата нажатий клавиш на клавиатуре
+
+    rocketObject = None            # Игрок не пустил ракету
+    invadersRocket = None          # Инопланетянин не пустил ракету
+    invadersSpeed = 3 + level // 5 # Рассчитываем скорость движения инопланетян
+
+    # Рассчитываем количество инопланетян по ширине и высоте
+    invadersWidth = (1 + int(level // 3)) * 2
+    invadersHeight = 2 + (level // 4)
+    if invadersWidth > 14:
+        invadersWidth = 14
+    if invadersHeight > 8:
+        invadersHeight = 8
+
+    # Рассчитываем максимальную точку Y (нижняя линия блока инопланетян). Необходимо, по тому что последующие
+    # расчеты происходят по мере смещения инопланетян по Y
+    maxY = (invadersHeight - 1) * 10 + SQUARE_SIZE * invadersHeight + SQUARE_SIZE // 2
+
+    invadersObject = []
+    for i in range(invadersWidth):
+        for j in range(invadersHeight):
+            # Уровень врага: 0 - слабый, 2 - сильный
+            rang = randint(0, level // 8)
+            if rang > 2:
+                rang = 2
+            posX = SQUARE_SIZE // 2 + (WIDTH // 2 - (invadersWidth * (SQUARE_SIZE + 10)) // 2) + \
+                   i * SQUARE_SIZE + i * 10
+            posY = 20 + j * 10 + j * SQUARE_SIZE
+            # rang умножаем на 2 потому что каждая вторая текстура - текстура для анимации,
+            # то есть нужны только изображения по индексам 0, 2, 4
+            invadersObject.append([cnv.create_image(posX, posY, image=invadersTexture[rang * 2]), rang])
+
+    # Вычисляем левую и правую границы блока инопланетян:
+    # левая - координаты объекта в списке с индексом [0] (левый верхний инопланетянин)
+    # правая граница - координаты последнего объекта (правый нижний инопланетянин)
+    leftInvadersBorder = cnv.coords(invadersObject[0][0])[0]
+    rightInvadersBorder = cnv.coords(invadersObject[len(invadersObject) - 1][0])[0]
+
+    # Космический корабль игрока на Canvas и количество выстрелов
+    player = [cnv.create_image(WIDTH // 2, HEIGHT - SQUARE_SIZE * 2, image=playerTexture), 1]
+
+    updateInfoLine()  # Обновляем информационный текст внизу экрана
+    mainloop()        # Запускаем игру
 
 # ++++++++++++++++++++ Основной блок программы +++++++++++++++
 
