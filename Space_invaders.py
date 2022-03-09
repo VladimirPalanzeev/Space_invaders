@@ -4,15 +4,38 @@ from time import sleep
 
 # Очистить всё и начать игру заново
 def continieAfterPause():
-    pass
+    btnContinueAfterPause.destroy()
+    saveScores(scores)
+    cnv.delete(ALL)
+    showMenu()
+    restartGame()
+
 
 # Запись очков в файл
 def endTableScore(inputWindow, positionPlayer):
-    pass
+    global playerName, scores
+    root.deiconify
+    inputWindow.destroy()
+    playerName = playerName.get()
+    if playerName == "":
+        playerName = defaltName
+    scores[positionPlayer][0] = playerName
+    continieAfterPause()
 
 # Фильтрация вводимых знаков
-def inputNameFilner(event):
-    pass
+def inputNameFilter(event):
+    global playerName
+    filter = "_- 0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZАБВГДЕЁЖЗИЙКЛМНОПРСЕУФХЦЧШЩЪЫЬЭЮЯ"
+    pN = ""
+    for i in playerName.get():
+        if(i.upper() in filter):
+            pN += i
+    if len(pN) > 20:
+        pN = pN[0:20]
+    elif pN == "":
+        pN = defaltName
+    playerName.set(pN)
+
 
 # Окно для ввода имени
 def getPlayerName(positionPlayer):
@@ -88,11 +111,28 @@ def startInvadersRocket():
 
 # Анимация взрыва
 def animationExplosion(frame, x, y):
-    pass
+    if not playGame:
+        return 0
+    tempExpl = cnv.create_image(x, y, image=explosionTexture[frame])
+    if frame > -1:
+        root.after(10, lambda frame=frame-1, x = x, y = y: animationExplosion(frame, x, y))
+    cnv.update()
+    sleep(0.01, + frame / 1000)
+    cnv.delete(tempExpl)
+
 
 # Старт анимации взрыва
 def startExplosion(n):
-    pass
+    global invadersObject
+    if not playGame:
+        return 0
+    animationExplosion(7, getInvadersX(invadersObject[n]), getInvadersY(invadersObject[n]))
+    invadersObject[n][1] -= 1
+    if invadersObject[n][1] < 0:
+        cnv.delete(invadersObject[n][0])
+        # Уничтожаем объект - инопланетянина, удаляя его из списка
+        del invadersObject[n]
+
 
 # Анимация ракеты
 def animationShoot(frame):
@@ -448,6 +488,7 @@ informationLine = None   # "Информационная строка" вниз�
 globalReset()     # Сбрасываем очки и прочее
 reset()           # Создаём игровой мир
 playGame = True
+
 mainloop()
 
 root.mainloop()
