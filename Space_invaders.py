@@ -145,7 +145,6 @@ def animationShoot(frame):
         rocketSpeedY =rocketSpeedYDefault
 
 
-
 # При нажатии на пробел - выстрел
 def shoot():
     global player, rocketObject
