@@ -39,23 +39,76 @@ def inputNameFilter(event):
 
 # Окно для ввода имени
 def getPlayerName(positionPlayer):
-    pass
+    global playerName
+
+    inputWindow = Toplevel(root)
+    inputWindow.grab_set()
+
+    # Настраиваем окно
+    X_NEW = root.winfo_screenwidth() // 2 - 150
+    Y_NEW = root.winfo_screenheight() // 2 - 260
+    inputWindow.geometry(f"{300}x{120}+{X_NEW}+{Y_NEW}")
+    inputWindow.overrideredirect(True)
+    inputWindow.focus_set()
+
+    Label(inputWindow, text="Вы - один из лучших! Как вас зовут: ").place(x=13, y=10)
+
+    playerName = StringVar()
+    playerName.set(defaltName)
+    newName = Entry(inputWindow, textvariable=playerName, width=45)
+    newName.place(x=13, y=40)
+    newName.focus_set()
+    newName.select_range(0, END)
+    newName.bind("<KeyRelease>", inputNameFilter)
+    btnGo = Button(inputWindow, text="Продолжить...", width=38)
+    btnGo.place(x=13, y=70)
+    btnGo["command"] = lambda iW = inputWindow, posP=positionPlayer: endTableScore(iW, posP)
+
+
 
 # Находим номер игрока в списке лучших
 def sortScoreTable(score):
-    pass
+    global scores
+    name = playerName
+    if playerName == None:
+        name = "Вы"
+    scores.append([name, score])
+
+    positionPlayer = 10
+    # Переносим игрока как можно выше в таблице в зависимости от очков
+    # (принцип "пузырьковой сортировки", попарное сравнение и обмен)
+    for i in range(len(scores) - 1, 0, -1):
+        if scores[i][1] > scores[i - 1][1]:
+            scores[i][0], scores[i - 1][0] = scores[i - 1][1], scores[i][0]
+            scores[i][1], scores[i - 1][1] = scores[i - 1][1], scores[i][1]
+            positionPlayer -= 1
+    # Удаляем последний элемент
+    del scores[10]
+
+    if positionPlayer < 10 and playerName == None:
+        getPlayerName(positionPlayer)
+    return positionPlayer
 
 # Конец игры
 def endGame():
-    pass
+    global playGame, btnContinueAfterPause, score
+    playGame = False
+    root.focus_set()
+    cnv.create_image(WIDTH // 2, HEIGHT // 2, image=backGround)
+    cnv.create_text(160, 80, fill="#FFFFFF", anchor="nw", font=f", 22", text=f"КОНЕЦ ИГРЫ. ЛУЧШИЕ ИГРОКИ:")
+    score -= penalty
+    showScores(sortScoreTable(int(score)))
+    btnContinueAfterPause = Button(root, text="Продолжить", width=70)
+    btnContinueAfterPause.place(x=140, y=HEIGHT - 50)
+    btnContinueAfterPause["command"] = continieAfterPause
 
 # Геттер - координата X инопланетянина obj
 def getInvadersX(obj):
-    pass
+    return cnv.coords(obj[0])[0]
 
 # Геттер - координата Y инопланетянина obj
 def getInvadersY(obj):
-    pass
+    return cnv.coords(obj[0])[1]
 
 # Геттер - координата X корабля игрока
 def getPlayerX():
@@ -63,15 +116,17 @@ def getPlayerX():
 
 # Геттер - координата Y корабля игрока
 def getPlayerY():
-    pass
+    return cnv.coords(player[0])[1]
+
 
 # Геттер - координата X ракеты
 def getRocketX():
-    pass
+    return cnv.coords(rocketObject)[0]
 
 # Геттер - координата Y ракеты
 def getRocketY():
-    pass
+    return cnv.coords(rocketObject)[1]
+
 
 # Обновляем инфостроку
 def updateInfoLine():
