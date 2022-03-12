@@ -25,7 +25,7 @@ def endTableScore(inputWindow, positionPlayer):
 # Фильтрация вводимых знаков
 def inputNameFilter(event):
     global playerName
-    filter = "_- 0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZАБВГДЕЁЖЗИЙКЛМНОПРСЕУФХЦЧШЩЪЫЬЭЮЯ"
+    filter = "_-0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZАБВГДЕЁЖЗИЙКЛМНОПРСЕУФХЦЧШЩЪЫЬЭЮЯ"
     pN = ""
     for i in playerName.get():
         if(i.upper() in filter):
@@ -130,39 +130,155 @@ def getRocketY():
 
 # Обновляем инфостроку
 def updateInfoLine():
-    pass
+    global informationLine
+    if informationLine != None:
+        for i in informationLine:
+            cnv.delete(i)
+
+    informationLine = []
+    informationLine.append(cnv.create_text(20, 440, fill="#abcdef", anchor="nw", font=f", 12",
+                                           text=f"ОЧКИ: {int(score)}"))
+    informationLine.append(cnv.create_text(170, 440, fill="#abcdef", anchor="nw", font=f", 12",
+                                           text=f"ВРАГИ: {len(invadersObject)}"))
+    informationLine.append(cnv.create_text(320, 440, fill="#abcdef", anchor="nw", font=f", 12",
+                                           text=f"ЖИЗНИ: {lives}"))
+    informationLine.append(cnv.create_text(480, 440, fill="#abcdef", anchor="nw", font=f", 12",
+                                           text=f"УРОВЕНЬ: {level}"))
+    informationLine.append(cnv.create_text(650, 440, fill="#abcdef", anchor="nw", font=f", 12",
+                                           text=f"ШТРАФЫ: -{penalty}"))
 
 # Запись очков в файл
 def saveScores(scoresToFile):
-    pass
+    # Данные нужны в формате: [str: Ник, int: Очки]
+    try:
+        f = open("scores01.dat", "w", encoding="utf-8")
+        for sc in scoresToFile:
+            f.write(f"{sc[0]}{sc[1]}\n")
+        f.close()
+    except:
+        print("Что-то пошло не так.")
 
-# Загрузка очков из scores.dat
+# Загрузка очков из scores01.dat
 def loadScores():
-    pass
+    ret = []
+    try:
+        f = open("scores01.dat", "r", encoding="utf-8")
+        for sc in f.readlines():
+            s = sc.replace("\n", "")
+            # Преобразовываем в список
+            s = s.split(" ")
+
+            # Проверяем. Защита от дурака на длинну ника
+            if len(s[0]) > 20:
+                s[0] = s[0][0:20]
+            elif s[0] == "":
+                s[0] = defaltName
+
+            # Проверяем. Защита от дурака на очки
+            s[1] = int(s[1])
+            if s[1] > 1000000:
+                s[1] = 1000000
+            elif s[1] < 0:
+                s[1] = 0
+            ret.append(s)
+        f.close()
+    except:
+        print("Файла не существует.")
+
+    if len(ret) != 10:
+        ret = []
+        for i in range(10):
+            ret.append([defaltName, 0])
+        saveScores(ret)
+    return ret
 
 # Удаляем таблицу очков
 def hideScores():
-    pass
+    global textScores
+    for i in textScores:
+        cnv.delete()
 
 # Рисуем таблицу очков
 def showScores(numberPlayer):
-    pass
+    global textScores
+    textScores = []
+    for i in range(len(scores)):
+        if i == numberPlayer:
+            colorText = "#00FF55"
+        else:
+            colorText = "AA9922"
+        textScores.append(cnv.create_text(210, 170 + i * 22, fill=colorText, font=", 14",
+                                          text=str(i + 1))) # Номер
+        textScores.append(cnv.create_text(240, 170 + i * 22, fill=colorText, anchor="w", font=", 14",
+                                          text=scores[i][0])) # Ник
+        textScores.append(cnv.create_text(590, 170 + i * 22, fill=colorText, anchor="e", font=", 14",
+                                          text=scores[i][1])) # Очки
 
 # Показываем кнопки меню
 def showMenu():
-    pass
+    global menu1, menu2, onMenu
+    if not onMenu:
+        menu1.place(x=235, y=37)
+        menu2.place(x=235, y=97)
+        # Показываем таблицу очков
+        showScores(-1)
+        onMenu = True
+    else:
+        hideMenu()
 
-# Скрываем кнопки меню
+# Скрываем кнопки меню, меняя их координаты
 def hideMenu():
-    pass
+    global menu1, menu2, onMenu
+    if onMenu:
+        menu1.place(x=-100, y=-100)
+        menu2.place(x=-100, y=-100)
+        onMenu = False
+        # Скрываем таблицу очков
+        hideScores()
+    else:
+        showMenu()
 
 # Анимация вражеской ракеты
 def animationInvadersRocket():
-    pass
+    global invadersRocket, invadersRocketSpeed, lives
+    if not playGame:
+        invadersRocket = None
+        invadersRocketSpeed = invadersRocketSpeedDefault
+        return 0
+    cnv.move(invadersRocket, invadersSpeed // 2, int(invadersRocketSpeed))
+    invadersRocketSpeed *= invadersRocketSpeedScale
+
+    x = cnv.coords(invadersRocket)[0]
+    y = cnv.coords(invadersRocket)[1]
+
+    # Рассчитываем попадание в игрока
+    if y > getPlayerY() - SQUARE_SIZE // 2:
+        if x > getPlayerX() - SQUARE_SIZE and x < getPlayerX() + SQUARE_SIZE:
+            animationExplosion(7, getPlayerX(), getPlayerY())
+
+            y = HEIGHT
+            lives -= 1
+            cnv.coords(player[0], WIDTH // 2, getPlayerY())
+    if y < HEIGHT:
+        root.after(20, animationInvadersRocket)
+    else:
+        cnv.delete(invadersRocket)
+        invadersRocket = None
+        invadersRocketSpeed = invadersRocketSpeedDefault
+
 
 # Стартуем ракету врага
 def startInvadersRocket():
-    pass
+    global invadersRocket
+    if not playGame:
+        return 0
+    if len(invadersObject > 0):
+        n = randint(0, len(invadersObject) - 1)
+        invadersRocket = cnv.create_image(getInvadersX(invadersObject[n]),
+                                          getInvadersY(invadersObject[n]),
+                                          image=invadersRocketTexture)
+        root.after(20, animationInvadersRocket)
+
 
 # Анимация взрыва
 def animationExplosion(frame, x, y):
