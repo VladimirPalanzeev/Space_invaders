@@ -293,6 +293,7 @@ def hideMenu():
         menu1.place(x=-100, y=-100)
         menu2.place(x=-100, y=-100)
         onMenu = False
+        mainloop()
         # Скрываем таблицу очков
         hideScores()
     else:
@@ -521,9 +522,9 @@ def mainloop():
     # Если список врагов пуст, то есть они все уничтожены
     if (len(invadersObject) == 0):
         endLevel()
-# Обработать меню маузы
+# Обработать меню паузы
     # Не выполняем mainloop(), если нет игры
-    if (not playGame):
+    if (not playGame or onMenu):
         return 0
 
     # Перерисовываем текстуры
