@@ -2,6 +2,8 @@ from tkinter import *
 from random import randint
 from time import sleep
 
+
+
 # Очистить всё и начать игру заново
 def continieAfterPause():
     btnContinueAfterPause.destroy()
@@ -14,7 +16,7 @@ def continieAfterPause():
 # Запись очков в файл
 def endTableScore(inputWindow, positionPlayer):
     global playerName, scores
-    root.deiconify
+    root.deiconify()
     inputWindow.destroy()
     playerName = playerName.get()
     if playerName == "":
@@ -60,9 +62,10 @@ def getPlayerName(positionPlayer):
     newName.focus_set()
     newName.select_range(0, END)
     newName.bind("<KeyRelease>", inputNameFilter)
+
     btnGo = Button(inputWindow, text="Продолжить...", width=38)
     btnGo.place(x=13, y=70)
-    btnGo["command"] = lambda iW = inputWindow, posP=positionPlayer: endTableScore(iW, posP)
+    btnGo["command"] = lambda iW=inputWindow, posP=positionPlayer: endTableScore(iW, posP)
 
 
 
@@ -95,7 +98,8 @@ def endGame():
     playGame = False
     root.focus_set()
     cnv.create_image(WIDTH // 2, HEIGHT // 2, image=backGround)
-    cnv.create_text(160, 80, fill="#FFFFFF", anchor="nw", font=f", 22", text=f"КОНЕЦ ИГРЫ. ЛУЧШИЕ ИГРОКИ:")
+    cnv.create_text(160, 80, fill="#FFFFFF", anchor="nw", font=f", 22",
+                    text=f"КОНЕЦ ИГРЫ. ЛУЧШИЕ ИГРОКИ:")
     score -= penalty
     showScores(sortScoreTable(int(score)))
     btnContinueAfterPause = Button(root, text="Продолжить", width=70)
@@ -136,33 +140,33 @@ def updateInfoLine():
             cnv.delete(i)
 
     informationLine = []
-    informationLine.append(cnv.create_text(20, 440, fill="#abcdef", anchor="nw", font=f", 12",
+    informationLine.append(cnv.create_text(20, 440, fill="#ABCDEF", anchor="nw", font=f", 12",
                                            text=f"ОЧКИ: {int(score)}"))
-    informationLine.append(cnv.create_text(170, 440, fill="#abcdef", anchor="nw", font=f", 12",
+    informationLine.append(cnv.create_text(170, 440, fill="#ABCDEF", anchor="nw", font=f", 12",
                                            text=f"ВРАГИ: {len(invadersObject)}"))
-    informationLine.append(cnv.create_text(320, 440, fill="#abcdef", anchor="nw", font=f", 12",
+    informationLine.append(cnv.create_text(320, 440, fill="#ABCDEF", anchor="nw", font=f", 12",
                                            text=f"ЖИЗНИ: {lives}"))
-    informationLine.append(cnv.create_text(480, 440, fill="#abcdef", anchor="nw", font=f", 12",
+    informationLine.append(cnv.create_text(480, 440, fill="#ABCDEF", anchor="nw", font=f", 12",
                                            text=f"УРОВЕНЬ: {level}"))
-    informationLine.append(cnv.create_text(650, 440, fill="#abcdef", anchor="nw", font=f", 12",
+    informationLine.append(cnv.create_text(650, 440, fill="#ABCDEF", anchor="nw", font=f", 12",
                                            text=f"ШТРАФЫ: -{penalty}"))
 
 # Запись очков в файл
 def saveScores(scoresToFile):
     # Данные нужны в формате: [str: Ник, int: Очки]
     try:
-        f = open("scores01.dat", "w", encoding="utf-8")
+        f = open("scores.dat", "w", encoding="utf-8")
         for sc in scoresToFile:
-            f.write(f"{sc[0]}{sc[1]}\n")
+            f.write(f"{sc[0]} {sc[1]}\n")
         f.close()
     except:
         print("Что-то пошло не так.")
 
-# Загрузка очков из scores01.dat
+# Загрузка очков из scores.dat
 def loadScores():
     ret = []
     try:
-        f = open("scores01.dat", "r", encoding="utf-8")
+        f = open("scores.dat", "r", encoding="utf-8")
         for sc in f.readlines():
             s = sc.replace("\n", "")
             # Преобразовываем в список
@@ -183,7 +187,7 @@ def loadScores():
             ret.append(s)
         f.close()
     except:
-        print("Файла не существует.")
+        print("Файла не существует !!!???.")
 
     if len(ret) != 10:
         ret = []
@@ -208,11 +212,11 @@ def showScores(numberPlayer):
         else:
             colorText = "AA9922"
         textScores.append(cnv.create_text(210, 170 + i * 22, fill=colorText, font=", 14",
-                                          text=str(i + 1))) # Номер
+                                          text=str(i + 1)))     # Номер
         textScores.append(cnv.create_text(240, 170 + i * 22, fill=colorText, anchor="w", font=", 14",
-                                          text=scores[i][0])) # Ник
+                                          text=scores[i][0]))   # Ник
         textScores.append(cnv.create_text(590, 170 + i * 22, fill=colorText, anchor="e", font=", 14",
-                                          text=scores[i][1])) # Очки
+                                          text=scores[i][1]))   # Очки
 
 # Показываем кнопки меню
 def showMenu():
@@ -245,7 +249,7 @@ def animationInvadersRocket():
         invadersRocket = None
         invadersRocketSpeed = invadersRocketSpeedDefault
         return 0
-    cnv.move(invadersRocket, invadersSpeed // 2, int(invadersRocketSpeed))
+    cnv.move(invadersRocket, invadersSpeed / 2, int(invadersRocketSpeed))
     invadersRocketSpeed *= invadersRocketSpeedScale
 
     x = cnv.coords(invadersRocket)[0]
@@ -272,7 +276,7 @@ def startInvadersRocket():
     global invadersRocket
     if not playGame:
         return 0
-    if len(invadersObject > 0):
+    if len(invadersObject) > 0:
         n = randint(0, len(invadersObject) - 1)
         invadersRocket = cnv.create_image(getInvadersX(invadersObject[n]),
                                           getInvadersY(invadersObject[n]),
@@ -286,9 +290,9 @@ def animationExplosion(frame, x, y):
         return 0
     tempExpl = cnv.create_image(x, y, image=explosionTexture[frame])
     if frame > -1:
-        root.after(10, lambda frame=frame-1, x = x, y = y: animationExplosion(frame, x, y))
+        root.after(10, lambda frame=frame - 1, x=x, y=y: animationExplosion(frame, x, y))
     cnv.update()
-    sleep(0.01, + frame / 1000)
+    sleep(0.01 + frame / 1000)
     cnv.delete(tempExpl)
 
 
@@ -323,7 +327,7 @@ def animationShoot(frame):
     frame += 1
     if frame > len(rocketTexture) - 1:
         frame = 0
-        sleep(0.02)
+    sleep(0.02)
     # Удаляем объект и создаем с новой текстурой
     cnv.delete(rocketObject)
     rocketObject = cnv.create_image(x, y, image=rocketTexture[frame])
@@ -337,12 +341,12 @@ def animationShoot(frame):
             invadersY = getInvadersY(invadersObject[find])
             # Коэффициент 0.4 - чем меньше, тем точнее надо попасть
             if abs(invadersX - rocketX) < SQUARE_SIZE * 0.4 and abs(invadersY - rocketY) < SQUARE_SIZE * 0.8:
-                score += 50
+                score += 50 * (level + 1)
                 startExplosion(find)
-                y = -1
+                y = - 1
                 find = len(invadersObject)
                 penalty -= 5
-                find += 1
+            find += 1
     if y > 0:
         # Рекурсивно вызываем анимацию
         root.after(3, lambda frame=frame: animationShoot(frame))
@@ -353,7 +357,7 @@ def animationShoot(frame):
         # P.S. Уменьшаем штраф на 5, когда ракета поразила цель
         penalty += 5
         player[1] += 1
-        rocketSpeedY =rocketSpeedYDefault
+        rocketSpeedY = rocketSpeedYDefault
 
 
 # При нажатии на пробел - выстрел
@@ -365,7 +369,9 @@ def shoot():
         return 0
     player[1] -= 1
 
-    rocketObject = cnv.create_image(getPlayerX(), getPlayerY(), image=rocketTexture[0])
+    rocketObject = cnv.create_image(getPlayerX(),
+                                    getPlayerY(),
+                                    image=rocketTexture[0])
     root.after(10, lambda frame=0: animationShoot(frame))
 
 # Перемещение игрока
@@ -375,7 +381,8 @@ def move(x):
     if x == LEFTKEY:
         cnv.move(player[0], -playerSpeed, 0)
     elif x == RIGHTKEY:
-        cnv.move(player[0, playerSpeed, 0])
+        cnv.move(player[0], playerSpeed, 0)
+
     if getPlayerX() < SQUARE_SIZE:
         cnv.move(player[0], playerSpeed, 0)
     elif getPlayerX() > WIDTH - SQUARE_SIZE:
@@ -492,9 +499,9 @@ def reset():
     cnv.create_image(WIDTH // 2, HEIGHT // 2, image=backGround)   # Создаем фон (нижний слой)
     cnv.focus_set() # Устанавливаем фокус для перехвата нажатий клавиш на клавиатуре
 
-    rocketObject = None            # Игрок не пустил ракету
-    invadersRocket = None          # Инопланетянин не пустил ракету
-    invadersSpeed = 3 + level // 5 # Рассчитываем скорость движения инопланетян
+    rocketObject = None             # Игрок не пустил ракету
+    invadersRocket = None           # Инопланетянин не пустил ракету
+    invadersSpeed = 3 + level // 5  # Рассчитываем скорость движения инопланетян
 
     # Рассчитываем количество инопланетян по ширине и высоте
     invadersWidth = (1 + int(level // 3)) * 2

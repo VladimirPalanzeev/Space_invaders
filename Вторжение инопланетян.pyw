@@ -521,7 +521,7 @@ def mainloop():
     # Если список врагов пуст, то есть они все уничтожены
     if (len(invadersObject) == 0):
         endLevel()
-
+# Обработать меню маузы
     # Не выполняем mainloop(), если нет игры
     if (not playGame):
         return 0
