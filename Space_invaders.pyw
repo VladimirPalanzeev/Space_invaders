@@ -12,7 +12,6 @@ def continieAfterPause():
     showMenu()
     restartGame()
 
-
 # Запись очков в файл
 def endTableScore(inputWindow, positionPlayer):
     global playerName, scores
@@ -23,6 +22,7 @@ def endTableScore(inputWindow, positionPlayer):
         playerName = defaltName
     scores[positionPlayer][0] = playerName
     continieAfterPause()
+
 
 # Фильтрация вводимых знаков
 def inputNameFilter(event):
@@ -68,17 +68,19 @@ def getPlayerName(positionPlayer):
     btnGo["command"] = lambda iW=inputWindow, posP=positionPlayer: endTableScore(iW, posP)
 
 
-
 # Находим номер игрока в списке лучших
 def sortScoreTable(score):
     global scores
+
     name = playerName
     if playerName == None:
         name = "Вы"
+
     scores.append([name, score])
 
     positionPlayer = 10
-    # Переносим игрока как можно выше в таблице в зависимости от очков
+    # Переносим игрока как можно выше
+    # в таблице в зависимости от очков
     # (принцип "пузырьковой сортировки", попарное сравнение и обмен)
     for i in range(len(scores) - 1, 0, -1):
         if scores[i][1] > scores[i - 1][1]:
@@ -200,7 +202,7 @@ def loadScores():
 def hideScores():
     global textScores
     for i in textScores:
-        cnv.delete()
+        cnv.delete(i)
 
 # Рисуем таблицу очков
 def showScores(numberPlayer):
@@ -210,12 +212,23 @@ def showScores(numberPlayer):
         if i == numberPlayer:
             colorText = "#00FF55"
         else:
-            colorText = "AA9922"
-        textScores.append(cnv.create_text(210, 170 + i * 22, fill=colorText, font=", 14",
+            colorText = "#AA9922"
+        textScores.append(cnv.create_text(210,
+                                          170 + i * 22,
+                                          fill=colorText,
+                                          font=", 14",
                                           text=str(i + 1)))     # Номер
-        textScores.append(cnv.create_text(240, 170 + i * 22, fill=colorText, anchor="w", font=", 14",
+        textScores.append(cnv.create_text(240,
+                                          170 + i * 22,
+                                          fill=colorText,
+                                          anchor="w",
+                                          font=", 14",
                                           text=scores[i][0]))   # Ник
-        textScores.append(cnv.create_text(590, 170 + i * 22, fill=colorText, anchor="e", font=", 14",
+        textScores.append(cnv.create_text(590,
+                                          170 + i * 22,
+                                          fill=colorText,
+                                          anchor="e",
+                                          font=", 14",
                                           text=scores[i][1]))   # Очки
 
 # Показываем кнопки меню
@@ -407,7 +420,7 @@ def endLevel():
     # Забираем фокус с Canvas чтобы не работали кнопки
     root.focus_set()
     root.update()
-    sleep(0.01)
+    sleep(0.5)
     root.after(300, nextLevel)
 
 # Главный цикл игры
