@@ -346,7 +346,9 @@ def animationShoot(frame):
     cnv.delete(rocketObject)
     rocketObject = cnv.create_image(x, y, image=rocketTexture[frame])
 
-    if cnv.coords(rocketObject)[1] < maxY + SQUARE_SIZE:
+    if cnv.coords(rocketObject)[1] < maxY + SQUARE_SIZE and\
+            cnv.coords(rocketObject)[0] < rightInvadersBorder + SQUARE_SIZE and\
+            cnv.coords(rocketObject)[0] > leftInvadersBorder - SQUARE_SIZE:
         rocketX = getRocketX()
         rocketY = getRocketY()
         find = 0
